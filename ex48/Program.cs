@@ -13,11 +13,14 @@ namespace ex48
             const string CommandCreateSquad = "1";
             const string CommandStartBattle = "2";
 
+            World world = new World();
+
             Console.Write($"Война\n\n{CommandCreateSquad} - создать отряды\n{CommandStartBattle} - начать битву\n\nВаш ввод: ");
 
             switch (Console.ReadLine())
             {
                 case CommandCreateSquad:
+                    world.CreateArmy();
                     break;
 
                 case CommandStartBattle:
@@ -26,21 +29,56 @@ namespace ex48
         }
     }
 
-    class BattleField
+    class World
     {
         private List<Soldier> _soldiers;
 
-        public BattleField()
+        public World()
         {
             _soldiers = new List<Soldier>
             {
-                new Sniper("Снайпер", 100, 250),
+                new Sniper("Снайпер", 100, 150),
                 new Pyro("Поджигатель", 400, 100),
-                new Medic("Медик", 200, 50),
-                new MachineGunner(),
-                new Bomber(),
-                new Engineer()
+                new Medic("Медик", 150, 50),
+                new MachineGunner("Пулеметчик", 600, 50),
+                new Bomber("Подрыватель", 250, 150),
+                new Engineer("Инжинер", 200, 100)
             };
+        }
+
+        public void CreateArmy()
+        {
+            List<Soldier> army = new List<Soldier>();
+            bool isEmpty = true;
+
+            while (isEmpty)
+            {
+                Console.Clear();
+
+                for (int i = 0; i < _soldiers.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {_soldiers[i].Name}");
+                }
+
+                Console.Write("Кого вы хотите добавить во взвод? ");
+
+                if (int.TryParse(Console.ReadLine(), out int index))
+                {
+                    army.Add(_soldiers[index - 1]);
+                }
+
+                if (army.Count > 5)
+                {
+                    isEmpty = false;
+                }
+            }
+
+            Console.WriteLine("Взвод номер один");
+
+            foreach (Soldier soldier in army)
+            {
+                Console.WriteLine($"{soldier.Name}");
+            }
         }
     }
 
@@ -72,21 +110,47 @@ namespace ex48
 
     class Sniper : Soldier
     {
-        public Sniper(string name, int health, int damage) : base(name, health, damage) { }
+        private int _critDamage;
+        private int _initialDamage;
+        private int _critMultiplier = 2;
+        private int _critDamageValue = 0;
+        private int _critDamageChance = 4;
+        private Random _random = new Random();
+
+        public Sniper(string name, int health, int damage) : base(name, health, damage)
+        {
+            Damage = _initialDamage;
+            _critDamage = Damage * _critMultiplier;
+        }
 
         public override void UseAbility()
         {
+            HeadShot();
+        }
 
+        public void HeadShot()
+        {
+            int chance = _random.Next(_critDamageChance);
+            Damage = _initialDamage;
+
+            if (chance == _critDamageValue)
+                Damage = _critDamage;
         }
     }
 
     class Pyro : Soldier
     {
+        private int _fireDamage = 10;
         public Pyro(string name, int health, int damage) : base(name, health, damage) { }
 
         public override void UseAbility()
         {
+            Burn();
+        }
 
+        public void Burn()
+        {
+            Damage += _fireDamage;
         }
     }
 
@@ -98,6 +162,11 @@ namespace ex48
         {
 
         }
+
+        public void Heal()
+        {
+
+        }
     }
 
     class Bomber : Soldier
@@ -106,7 +175,7 @@ namespace ex48
 
         public override void UseAbility()
         {
-            
+
         }
     }
 
