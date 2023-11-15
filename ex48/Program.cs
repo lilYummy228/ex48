@@ -158,13 +158,8 @@ namespace ex48
         }
     }
 
-    class Soldier
+    abstract class Soldier
     {
-        public string Name { get; protected set; }
-        public int Health { get; protected set; }
-        public int Damage { get; protected set; }
-        public int InitialDamage { get; protected set; }
-
         public Soldier(string name, int health, int damage)
         {
             Name = name;
@@ -173,6 +168,11 @@ namespace ex48
             InitialDamage = Damage;
         }
 
+        public string Name { get; protected set; }
+        public int Health { get; protected set; }
+        public int Damage { get; protected set; }
+        public int InitialDamage { get; protected set; }
+
         public void ShowInfo()
         {
             Console.WriteLine($"{Name}, Здоровье: {Health}, урон: {Damage}");
@@ -180,8 +180,13 @@ namespace ex48
 
         public void TakeDamage(int damage)
         {
+            if (damage < 0)
+            {
+                damage = 0;
+            }
+
             Health -= damage;
-            Console.WriteLine($"\n{Name} нанес {damage} урона");
+            Console.WriteLine($"\n{Name} нанес {Damage} урона");
         }
 
         public void UseAnAttack()
@@ -200,7 +205,7 @@ namespace ex48
             }
         }
 
-        protected virtual void UseAttack() { }
+        protected abstract void UseAttack();
     }
 
     class Sniper : Soldier
